@@ -13,6 +13,9 @@ import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { createStyleImportPlugin, ElementPlusResolve } from 'vite-plugin-style-import'
 import UnoCSS from 'unocss/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 const root = process.cwd()
@@ -90,6 +93,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       }),
       UnoCSS(),
       // sveltekit(),
+      AutoImport({
+        imports: [
+          'vue',
+          'vue-router',
+          // 其他需要自动导入的库
+        ],
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        // 配置需要自动注册的组件
+        dts: true,
+        resolvers: [ElementPlusResolver()],
+      }),
     ],
 
     css: {

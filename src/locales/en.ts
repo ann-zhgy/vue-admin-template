@@ -527,5 +527,9 @@ export default {
   inputPasswordDemo: {
     title: 'InputPassword',
     inputPasswordDes: 'Secondary packaging of Input components based on ElementPlus'
+  },
+  editableTable: {
+    popconfirmTitle: 'Are you sure to delete this?',
+    popconfirmButtonContent: 'delete'
   }
 }
