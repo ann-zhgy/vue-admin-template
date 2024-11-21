@@ -15,7 +15,8 @@ import {
   ElButton,
   FormValidateCallback,
   FormItemProp,
-  FormValidationResult
+  FormValidationResult,
+  ElTooltip
 } from 'element-plus'
 import type { RuleItem, Rules } from 'async-validator'
 import { useI18n } from '@/hooks/web/useI18n'
@@ -37,7 +38,7 @@ export default defineComponent({
     default: any
   }>,
   emits: ['update:data'],
-  setup(props, { emit, attrs, slots }) {
+  setup(props, { emit, attrs, slots, expose }) {
     const columnPropertyInfo = slots
       .default()
       .filter((item: { props: { prop: any } }) => item.props.prop)
@@ -138,6 +139,8 @@ export default defineComponent({
         formRef.value?.validateField(formPropKeys)
       })
     }
+
+    expose({ addRow: initRefByRow })
 
     // clearValidate resetFields scrollToField validate validateField
     const formRef = ref<{
@@ -281,40 +284,48 @@ export default defineComponent({
     const { t } = useI18n()
 
     return () => (
-      <div class="tb-container" id="tableRef">
-        <ElForm style={{ width: '100%' }} ref={formRef} model={editableTableData.value.formData}>
-          <ElTable
-            data={editableTableData.value.data}
-            {...attrs}
-            ref={elTableRef}
-            onCell-dblclick={cellDblclick}
-            onCell-mouse-leave={cellMouseLeave}
-            onRow-contextmenu={rightClick}
-            onHeader-click={addRow}
-          >
-            {slots.default()}
-          </ElTable>
-        </ElForm>
+      <ElTooltip
+        class="box-item"
+        effect="light"
+        content="双击表头添加行，双击单元格修改数据，在行上面右键可选择删除行"
+        placement="top-end"
+        autoClose={2000}
+      >
+        <div class="tb-container" id="tableRef">
+          <ElForm style={{ width: '100%' }} ref={formRef} model={editableTableData.value.formData}>
+            <ElTable
+              data={editableTableData.value.data}
+              {...attrs}
+              ref={elTableRef}
+              onCell-dblclick={cellDblclick}
+              onCell-mouse-leave={cellMouseLeave}
+              onRow-contextmenu={rightClick}
+              onHeader-click={addRow}
+            >
+              {slots.default()}
+            </ElTable>
+          </ElForm>
 
-        <div
-          v-show={tableEditState.value.showMenu}
-          onMouseleave={() => (tableEditState.value.showMenu = false)}
-          id="contextmenu"
-        >
-          <ElPopconfirm
-            title={t('editableTable.popconfirmTitle')}
-            onConfirm={delRow}
-            teleported={false}
-            onCancel={() => (tableEditState.value.showMenu = false)}
+          <div
+            v-show={tableEditState.value.showMenu}
+            onMouseleave={() => (tableEditState.value.showMenu = false)}
+            id="contextmenu"
           >
-            {{
-              reference: () => (
-                <ElButton type="primary">{t('editableTable.popconfirmButtonContent')}</ElButton>
-              )
-            }}
-          </ElPopconfirm>
+            <ElPopconfirm
+              title={t('editableTable.popconfirmTitle')}
+              onConfirm={delRow}
+              teleported={false}
+              onCancel={() => (tableEditState.value.showMenu = false)}
+            >
+              {{
+                reference: () => (
+                  <ElButton type="primary">{t('editableTable.popconfirmButtonContent')}</ElButton>
+                )
+              }}
+            </ElPopconfirm>
+          </div>
         </div>
-      </div>
+      </ElTooltip>
     )
   }
 })
