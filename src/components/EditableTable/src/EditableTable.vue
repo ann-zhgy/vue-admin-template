@@ -1,6 +1,12 @@
 <script lang="tsx">
 import { defineComponent, nextTick, provide, ref, SlotsType, watch } from 'vue'
-import { buildTableFormKey, EditableTableData, EditableTableRow, TableEditState } from './types'
+import {
+  buildTableFormKey,
+  EditableTableData,
+  EditableTableState,
+  RowEditState,
+  TableEditState
+} from './types'
 import {
   Column,
   ElTable,
@@ -13,14 +19,13 @@ import {
 } from 'element-plus'
 import type { RuleItem, Rules } from 'async-validator'
 import { useI18n } from '@/hooks/web/useI18n'
-import { Arrayable } from '@vueuse/core'
 import Schema from 'async-validator'
 
 export default defineComponent({
   name: 'EditableTable',
   props: {
     data: {
-      type: Array<Object>,
+      type: Array<Record<string, any>>,
       default: () => []
     },
     defaultRow: {
@@ -52,47 +57,92 @@ export default defineComponent({
       propsData.forEach((item, index) => {
         for (const key in item) {
           if (Object.prototype.hasOwnProperty.call(item, key)) {
-            result[buildTableFormKey(index, key)] = item[key] ?? []
+            result[buildTableFormKey(index, key)] = item[key] ?? null
           }
         }
       })
       return result
     }
     const convertPropsDataToEditableData = (propsData: object[]): EditableTableData => {
+      return { data: propsData, formData: buildFormData(propsData) }
+    }
+    const convertPropsDataToEditableState = (propsData: object[]): EditableTableState => {
       return !propsData
-        ? { data: [], formData: {} }
-        : {
-            data: propsData.map((item, index) => {
-              return {
-                data: item,
-                rowState: { rowIndex: index, editableColIds: [], rowValid: true }
-              } as EditableTableRow
-            }),
-            formData: buildFormData(propsData)
-          }
+        ? []
+        : propsData.map((_item, index) => {
+            return { rowIndex: index, editableColIds: [] } as RowEditState
+          })
     }
     const editableTableData = ref<EditableTableData>(convertPropsDataToEditableData(props.data))
+    const editableTableState = ref<EditableTableState>(convertPropsDataToEditableState(props.data))
+
     provide('editableTableData', editableTableData)
+    provide('editableTableState', editableTableState)
     watch(
       editableTableData,
-      (newValue) =>
-        emit(
-          'update:data',
-          newValue.data.map((item) => item.data)
-        ),
+      (newValue) => {
+        console.log('editableTableData', newValue)
+        emit('update:data', JSON.parse(JSON.stringify(newValue.data)))
+      },
       {
-        deep: true,
-        immediate: true
+        deep: true
       }
     )
-    watch(props.data, (newValue) => {
-      editableTableData.value = convertPropsDataToEditableData(newValue)
-    })
+    watch(
+      props.data,
+      (newValue) => {
+        console.log('props.data', newValue)
+        editableTableData.value = { data: [], formData: {} }
+        editableTableState.value = []
+        newValue?.forEach((item) => {
+          initRefByRow(item)
+        })
+      },
+      {
+        deep: true
+      }
+    )
+
+    const initRefByRow = (rowData: any) => {
+      if (!editableTableData.value || !editableTableData.value.data) {
+        editableTableData.value.data = []
+      }
+      const length = editableTableData.value.data.length
+      const rowState: RowEditState = { rowIndex: length, editableColIds: [] }
+      const formPropKeys: string[] = []
+      const validatorRules: Rules = {}
+      // 填充字段值
+      columnPropertyInfo.forEach((item: { prop: string; rules: any }) => {
+        const tableFormKey = buildTableFormKey(length, item.prop)
+        editableTableData.value.formData[tableFormKey] = rowData[item.prop]
+        formPropKeys.push(tableFormKey)
+        validatorRules[tableFormKey] = item.rules ?? []
+      })
+      // 检验字段值
+      const validator = new Schema(validatorRules)
+      // debugger
+      validator.validate(editableTableData.value.formData, {}, (errors, _fields) => {
+        errors?.forEach((item) => {
+          if (item.field) {
+            const index = formPropKeys.indexOf(item.field as string)
+            if (index !== -1) {
+              // el-table_1_column_1
+              rowState.editableColIds.push(`el-table_1_column_${index + 1}`)
+            }
+          }
+        })
+      })
+      editableTableData.value.data[length] = rowData
+      editableTableState.value[length] = rowState
+      nextTick(() => {
+        formRef.value?.validateField(formPropKeys)
+      })
+    }
 
     // clearValidate resetFields scrollToField validate validateField
     const formRef = ref<{
       validateField: (
-        props?: Arrayable<FormItemProp> | undefined,
+        props?: FormItemProp[] | undefined,
         callback?: FormValidateCallback | undefined
       ) => FormValidationResult
       [key: string]: any
@@ -106,41 +156,7 @@ export default defineComponent({
       // 设置一个合理的阈值，例如300毫秒内两次点击视为双击
       if (timeDifference < 300) {
         // 这里是双击事件的处理逻辑
-        if (!editableTableData.value || !editableTableData.value.data) {
-          editableTableData.value.data = []
-        }
-        const length = editableTableData.value.data.length
-        const editableRow: EditableTableRow = {
-          data: props.defaultRow,
-          rowState: { rowIndex: length, editableColIds: [] }
-        }
-        const formPropKeys: string[] = []
-        const validatorRules: Rules = {}
-        // 填充字段值
-        columnPropertyInfo.forEach((item: { prop: string; rules: any }) => {
-          const tableFormKey = buildTableFormKey(length, item.prop)
-          editableTableData.value.formData[tableFormKey] = props.defaultRow[item.prop]
-          formPropKeys.push(tableFormKey)
-          validatorRules[tableFormKey] = item.rules ?? []
-        })
-        // 检验字段值
-        const validator = new Schema(validatorRules)
-        // debugger
-        validator.validate(editableTableData.value.formData, {}, (errors, _fields) => {
-          errors?.forEach((item) => {
-            if (item.field) {
-              const index = formPropKeys.indexOf(item.field as string)
-              if (index !== -1) {
-                // el-table_1_column_1
-                editableRow.rowState.editableColIds.push(`el-table_1_column_${index + 1}`)
-              }
-            }
-          })
-        })
-        editableTableData.value.data.push(editableRow)
-        nextTick(() => {
-          formRef.value?.validateField(formPropKeys)
-        })
+        initRefByRow(props.defaultRow)
         // 清除上一次点击的时间戳，避免连续的双击被视为更多的双击
         addRowLastClickTime = 0
       } else {
@@ -150,22 +166,29 @@ export default defineComponent({
     }
 
     const tableEditState = ref<TableEditState>({ showMenu: false, currentRowIndex: -1 })
-    const cellDblclick = (row: EditableTableRow, column: Column, cell: HTMLTableCellElement) => {
-      row.rowState.editableColIds.push(column.id)
+    const cellDblclick = (
+      row: Record<string | number | symbol, any>,
+      column: Column,
+      cell: HTMLTableCellElement
+    ) => {
+      const rowIndex = editableTableData.value.data.indexOf(row)
+      editableTableState.value[rowIndex].editableColIds.push(column.id)
 
       nextTick(() => {
         // 如果内部是 input，获取焦点
         const element = findEditableChildren(cell)
         if (element) {
           if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-            element.focus({ preventScroll: true })
+            element.focus()
           }
         }
       })
     }
 
-    function cellMouseLeave(row: EditableTableRow, column: Column, cell: HTMLTableCellElement) {
-      if (!row.rowState.editableColIds || row.rowState.editableColIds.indexOf(column.id) === -1) {
+    function cellMouseLeave(row: any, column: Column, cell: HTMLTableCellElement) {
+      const rowIndex = editableTableData.value.data.indexOf(row)
+      const rowState = editableTableState.value[rowIndex]
+      if (!rowState || rowState.editableColIds.indexOf(column.id) === -1) {
         return
       }
       const element = findEditableChildren(cell)
@@ -175,8 +198,8 @@ export default defineComponent({
       const key = buildTableFormKey(editableTableData.value.data.indexOf(row), column.property)
       formRef.value?.validateField([key], (isValid: boolean) => {
         if (isValid) {
-          const columnIdIndex = row.rowState.editableColIds.indexOf(column.id)
-          if (columnIdIndex !== -1) row.rowState.editableColIds.splice(columnIdIndex, 1)
+          const columnIdIndex = rowState.editableColIds.indexOf(column.id)
+          if (columnIdIndex !== -1) rowState.editableColIds.splice(columnIdIndex, 1)
         }
       })
     }
@@ -203,7 +226,7 @@ export default defineComponent({
       return null
     }
 
-    function rightClick(row: EditableTableRow, _column: Column, $event: MouseEvent) {
+    function rightClick(row: any, _column: Column, $event: MouseEvent) {
       $event.preventDefault()
       tableEditState.value.showMenu = false
       locateMenu('contextmenu', 140, $event)
@@ -244,6 +267,7 @@ export default defineComponent({
       const currentRowIndex = tableEditState.value.currentRowIndex
       if (currentRowIndex !== -1) {
         editableTableData.value.data.splice(currentRowIndex, 1)
+        editableTableState.value.splice(currentRowIndex, 1)
         const item = editableTableData.value.data[currentRowIndex]
         for (const key in item) {
           if (Object.prototype.hasOwnProperty.call(item, key)) {

@@ -8,13 +8,10 @@ export interface RowEditState {
   editableColIds: string[]
 }
 
-export interface EditableTableRow {
-  data: Record<string | number | symbol, any>
-  rowState: RowEditState
-}
+export declare type EditableTableState = RowEditState[]
 
 export interface EditableTableData {
-  data: EditableTableRow[]
+  data: Record<string | number | symbol, any>[]
   formData: Record<string | number | symbol, any>
 }
 
