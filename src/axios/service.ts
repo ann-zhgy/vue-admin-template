@@ -4,6 +4,7 @@ import { defaultRequestInterceptors, defaultResponseInterceptors } from './confi
 import { AxiosInstance, InternalAxiosRequestConfig, RequestConfig, AxiosResponse } from './types'
 import { ElMessage } from 'element-plus'
 import { REQUEST_TIMEOUT } from '@/constants'
+import { useUserStore } from '@/store/modules/user'
 
 export const PATH_URL = import.meta.env.VITE_API_BASE_PATH
 
@@ -18,6 +19,10 @@ axiosInstance.interceptors.request.use((res: InternalAxiosRequestConfig) => {
   const controller = new AbortController()
   const url = res.url || ''
   res.signal = controller.signal
+  const userStore = useUserStore()
+  if (userStore.getToken) {
+    res.headers.set('token', userStore.getToken)
+  }
   abortControllerMap.set(url, controller)
   return res
 })

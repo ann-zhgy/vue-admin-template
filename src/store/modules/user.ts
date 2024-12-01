@@ -1,65 +1,39 @@
 import { defineStore } from 'pinia'
 import { store } from '../index'
-import { UserLoginType, UserType } from '@/api/login/types'
+import { RBACModelUserInfo, SimpleUserInfo } from '@/api/login/types'
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
 import { loginOutApi } from '@/api/login'
 import { useTagsViewStore } from './tagsView'
 import router from '@/router'
+import { usePermissionStore } from './permission'
 
 interface UserState {
-  userInfo?: UserType
-  tokenKey: string
+  userInfo?: SimpleUserInfo | RBACModelUserInfo
   token: string
-  roleRouters?: string[] | AppCustomRouteRecordRaw[]
-  rememberMe: boolean
-  loginInfo?: UserLoginType
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => {
     return {
       userInfo: undefined,
-      tokenKey: 'Authorization',
-      token: '',
-      roleRouters: undefined,
-      // 记住我
-      rememberMe: true,
-      loginInfo: undefined
+      token: ''
     }
   },
   getters: {
-    getTokenKey(): string {
-      return this.tokenKey
-    },
     getToken(): string {
       return this.token
     },
-    getUserInfo(): UserType | undefined {
+    getUserInfo(): SimpleUserInfo | RBACModelUserInfo | undefined {
       return this.userInfo
-    },
-    getRoleRouters(): string[] | AppCustomRouteRecordRaw[] | undefined {
-      return this.roleRouters
-    },
-    getRememberMe(): boolean {
-      return this.rememberMe
-    },
-    getLoginInfo(): UserLoginType | undefined {
-      return this.loginInfo
     }
   },
   actions: {
-    setTokenKey(tokenKey: string) {
-      this.tokenKey = tokenKey
-    },
     setToken(token: string) {
       this.token = token
     },
-    setUserInfo(userInfo?: UserType) {
+    setUserInfo(userInfo?: SimpleUserInfo | RBACModelUserInfo) {
       this.userInfo = userInfo
-    },
-    setRoleRouters(roleRouters: string[] | AppCustomRouteRecordRaw[]) {
-      this.roleRouters = roleRouters
     },
     logoutConfirm() {
       const { t } = useI18n()
@@ -71,7 +45,7 @@ export const useUserStore = defineStore('user', {
         .then(async () => {
           const res = await loginOutApi().catch(() => {})
           if (res) {
-            this.reset()
+            this.logout()
           }
         })
         .catch(() => {})
@@ -81,17 +55,11 @@ export const useUserStore = defineStore('user', {
       tagsViewStore.delAllViews()
       this.setToken('')
       this.setUserInfo(undefined)
-      this.setRoleRouters([])
       router.replace('/login')
+      usePermissionStore().resetRouters()
     },
     logout() {
       this.reset()
-    },
-    setRememberMe(rememberMe: boolean) {
-      this.rememberMe = rememberMe
-    },
-    setLoginInfo(loginInfo: UserLoginType | undefined) {
-      this.loginInfo = loginInfo
     }
   },
   persist: true

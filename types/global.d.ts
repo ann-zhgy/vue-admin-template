@@ -45,8 +45,9 @@ declare global {
     responseType?: AxiosResponseType
   }
 
-  declare interface IResponse<T = any> {
-    code: number
+  declare interface BaseResponse<T = any> {
+    code: string
+    mesage: string
     data: T extends any ? T : T & any
   }
 

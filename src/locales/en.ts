@@ -531,5 +531,8 @@ export default {
   editableTable: {
     popconfirmTitle: 'Are you sure to delete this?',
     popconfirmButtonContent: 'delete'
+  },
+  mol3dViewer: {
+    initFail: '3Dmol init fail!'
   }
 }

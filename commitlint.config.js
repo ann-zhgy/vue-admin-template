@@ -2,11 +2,12 @@ module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
-      2,
+      1,
       'always',
       [
         'feat', // 新功能(feature)
-        'fix', // 修补bug
+        'bugfix', // 修补bug
+        'hotfix', // 修补紧急bug
         'docs', // 文档(documentation)
         'style', // 格式、样式(不影响代码运行的变动)
         'refactor', // 重构(即不是新增功能，也不是修改BUG的代码)

@@ -100,10 +100,11 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           // 其他需要自动导入的库
         ],
         resolvers: [ElementPlusResolver()],
+        dts: 'auto-imports.d.ts',
       }),
       Components({
         // 配置需要自动注册的组件
-        dts: true,
+        dts: 'components.d.ts',
         resolvers: [ElementPlusResolver()],
       }),
     ],
@@ -156,7 +157,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       proxy: {
         // 选项写法
         '/api': {
-          target: 'http://127.0.0.1:8000',
+          target: env.VITE_API_BASE_PATH,
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, '')
         }

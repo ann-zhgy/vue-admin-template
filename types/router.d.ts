@@ -30,13 +30,17 @@ import { defineComponent } from 'vue'
     canTo: true               设置为true即使hidden为true，也依然可以进行路由跳转(默认 false)
 
     permission: ['edit','add', 'delete']    设置该路由的权限
+
+    showInStatic: 当没有权限控制，即：前端渲染菜单时，是否展示
   }
 **/
 declare module 'vue-router' {
   interface RouteMeta extends Record<string | number | symbol, unknown> {
+    title: string
+    permission?: string[]
+    showInStatic?: boolean
     hidden?: boolean
     alwaysShow?: boolean
-    title?: string
     icon?: string
     noCache?: boolean
     breadcrumb?: boolean
@@ -45,7 +49,6 @@ declare module 'vue-router' {
     noTagsView?: boolean
     followAuth?: string
     canTo?: boolean
-    permission?: string[]
   }
 }
 

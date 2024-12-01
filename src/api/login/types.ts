@@ -1,12 +1,33 @@
-export type UserLoginType = {
-  username: string
-  password: string
+export type LoginParam = {
+  username?: string
+  email?: string
+  password?: string
+  phone?: string
+  verificationCode?: string
 }
 
-export type UserType = {
+export type LoginResponse = {
+  token: string
+}
+
+export type SimpleUserInfo = {
   username: string
-  password: string
-  role: string
-  roleId: string
-  permissions: string | string[]
+  email?: string
+  phone?: string
+  avatar?: string
+  permissions: string[]
+}
+
+export type MenuInfo = {
+  key: string
+  title: string
+}
+
+export type RBACModelUserInfo = {
+  username: string
+  email?: string
+  phone?: string
+  avatar?: string
+  roles: string[]
+  menus: MenuInfo[]
 }

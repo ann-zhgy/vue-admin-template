@@ -7,6 +7,13 @@ import { unref } from 'vue'
 import { useCssVar } from '@vueuse/core'
 import { useDark } from '@vueuse/core'
 
+export enum AuthorizeModel {
+  // 简单模型，用户携带权限标志，前端根据权限标志设置菜单
+  SIMPLE,
+  // RBAC模型，返回菜单必要配置
+  RBAC
+}
+
 interface AppState {
   breadcrumb: boolean
   breadcrumbIcon: boolean
@@ -22,7 +29,7 @@ interface AppState {
   fixedHeader: boolean
   greyMode: boolean
   dynamicRouter: boolean
-  serverDynamicRouter: boolean
+  authorizeModel: AuthorizeModel
   pageLoading: boolean
   layout: LayoutType
   title: string
@@ -57,7 +64,7 @@ export const useAppStore = defineStore('app', {
       footer: true, // 显示页脚
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日
       dynamicRouter: true, // 是否动态路由
-      serverDynamicRouter: true, // 是否服务端渲染动态路由
+      authorizeModel: AuthorizeModel.SIMPLE, // 权限模型
       fixedMenu: false, // 是否固定菜单
 
       layout: 'classic', // layout布局
@@ -138,8 +145,8 @@ export const useAppStore = defineStore('app', {
     getDynamicRouter(): boolean {
       return this.dynamicRouter
     },
-    getServerDynamicRouter(): boolean {
-      return this.serverDynamicRouter
+    getAuthorizeModel(): AuthorizeModel {
+      return this.authorizeModel
     },
     getFixedMenu(): boolean {
       return this.fixedMenu
@@ -215,8 +222,8 @@ export const useAppStore = defineStore('app', {
     setDynamicRouter(dynamicRouter: boolean) {
       this.dynamicRouter = dynamicRouter
     },
-    setServerDynamicRouter(serverDynamicRouter: boolean) {
-      this.serverDynamicRouter = serverDynamicRouter
+    setAuthorizeModel(authorizeModel: AuthorizeModel) {
+      this.authorizeModel = authorizeModel
     },
     setFixedMenu(fixedMenu: boolean) {
       this.fixedMenu = fixedMenu

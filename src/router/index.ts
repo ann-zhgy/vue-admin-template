@@ -63,7 +63,8 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     name: 'Level',
     meta: {
       title: t('router.level'),
-      icon: 'carbon:skill-level-advanced'
+      icon: 'carbon:skill-level-advanced',
+      permission: ['admin', 'basic']
     },
     children: [
       {
@@ -72,7 +73,8 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         component: getParentLayout(),
         redirect: '/level/menu1/menu1-1/menu1-1-1',
         meta: {
-          title: t('router.menu1')
+          title: t('router.menu1'),
+          permission: ['admin', 'basic']
         },
         children: [
           {
@@ -82,7 +84,8 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
             redirect: '/level/menu1/menu1-1/menu1-1-1',
             meta: {
               title: t('router.menu11'),
-              alwaysShow: true
+              alwaysShow: true,
+              permission: ['admin', 'basic']
             },
             children: [
               {
@@ -90,7 +93,8 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
                 name: 'Menu111',
                 component: () => import('@/views/Level/Menu111.vue'),
                 meta: {
-                  title: t('router.menu111')
+                  title: t('router.menu111'),
+                  permission: ['admin', 'basic']
                 }
               }
             ]
@@ -100,7 +104,8 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
             name: 'Menu12',
             component: () => import('@/views/Level/Menu12.vue'),
             meta: {
-              title: t('router.menu12')
+              title: t('router.menu12'),
+              permission: ['admin']
             }
           }
         ]
@@ -110,7 +115,9 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         name: 'Menu2',
         component: () => import('@/views/Level/Menu2.vue'),
         meta: {
-          title: t('router.menu2')
+          title: t('router.menu2'),
+          permission: ['admin'],
+          showInStatic: false
         }
       }
     ]

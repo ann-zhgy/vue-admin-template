@@ -1,3 +1,4 @@
+<script lang="tsx">
 import { ElFormItem, ElTableColumn, FormItemRule } from 'element-plus'
 import { defineComponent, inject, Ref, SlotsType } from 'vue'
 import { buildTableFormKey, EditableTableState } from '../types'
@@ -27,8 +28,8 @@ export default defineComponent({
     const property: string = props.prop ?? props.property
     const editableTableState = inject<Ref<EditableTableState>>('editableTableState')
 
-    const isShowState = (index: number, columnId: string) => {
-      return editableTableState!.value[index].editableColIds.indexOf(columnId) === -1
+    const isShowState = (columnId: string) => {
+      return editableTableState!.value.editingCell.indexOf(columnId) === -1
     }
 
     return () => (
@@ -36,7 +37,7 @@ export default defineComponent({
         {{
           default: (scope: any) =>
             property ? (
-              isShowState(scope.$index, scope.column.id) ? (
+              isShowState(buildTableFormKey(scope.$index, property)) ? (
                 slots.show ? (
                   slots.show({ ...scope, row: scope.row })
                 ) : (
@@ -59,3 +60,4 @@ export default defineComponent({
     )
   }
 })
+</script>

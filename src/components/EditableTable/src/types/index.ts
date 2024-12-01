@@ -1,25 +1,22 @@
+import { RuleItem } from 'async-validator'
+
 export interface TableEditState {
   showMenu: boolean
   currentRowIndex: number
 }
 
-export interface RowEditState {
-  rowIndex: number
-  editableColIds: string[]
-}
+export declare type EditableTableData = Record<string | number | symbol, any>[]
 
-export declare type EditableTableState = RowEditState[]
+export declare type EditableTableFormData = Record<string | number | symbol, any>
 
-export interface EditableTableData {
-  data: Record<string | number | symbol, any>[]
-  formData: Record<string | number | symbol, any>
+export declare type EditableTableFormRules = Record<string | number | symbol, RuleItem[]>
+
+export interface EditableTableState {
+  editingCell: string[]
+  formData: EditableTableFormData
+  formRules: EditableTableFormRules
 }
 
 export const buildTableFormKey = (rowIndex: number, fieldName: string): string => {
   return `form.${rowIndex}.${fieldName}`
-}
-
-// EditableTable 组件会暴露addRow方法用来在外部添加数据
-export interface ExposedEditableTable {
-  addRow: (rowData: any) => void
 }

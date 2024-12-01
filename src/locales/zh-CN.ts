@@ -525,5 +525,8 @@ export default {
   editableTable: {
     popconfirmTitle: '确定删除该行吗？',
     popconfirmButtonContent: '删除当前行'
+  },
+  mol3dViewer: {
+    initFail: '3Dmol 初始化失败'
   }
 }

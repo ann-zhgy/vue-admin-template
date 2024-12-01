@@ -1,55 +1,22 @@
+import { SimpleUserInfo } from '@/api/login/types'
 import { SUCCESS_CODE } from '@/constants'
 
 const timeout = 1000
 
-const List: {
-  username: string
-  password: string
-  role: string
-  roleId: string
-  permissions: string | string[]
-}[] = [
-  {
-    username: 'admin',
-    password: 'admin',
-    role: 'admin',
-    roleId: '1',
-    permissions: ['*.*.*']
-  },
-  {
-    username: 'test',
-    password: 'test',
-    role: 'test',
-    roleId: '2',
-    permissions: ['example:dialog:create', 'example:dialog:delete']
-  }
-]
+const simpleUserAdmin: SimpleUserInfo = { username: 'admin', permissions: ['admin', 'basic'] }
+const simpleUserTest: SimpleUserInfo = { username: 'test', permissions: ['basic'] }
+
+const simpleUserMap: Map<string, { token: string; userInfo: SimpleUserInfo }> = new Map([
+  ['admin', { token: 'admin-token', userInfo: simpleUserAdmin }],
+  ['test', { token: 'test-token', userInfo: simpleUserTest }]
+])
+
+const simpleTokenUserMap: Map<string, SimpleUserInfo> = new Map([
+  ['admin-token', simpleUserAdmin],
+  ['test-token', simpleUserTest]
+])
 
 export default [
-  // 列表接口
-  {
-    url: '/mock/user/list',
-    method: 'get',
-    response: ({ query }) => {
-      const { username, pageIndex, pageSize } = query
-
-      const mockList = List.filter((item) => {
-        if (username && item.username.indexOf(username) < 0) return false
-        return true
-      })
-      const pageList = mockList.filter(
-        (_, index) => index < pageSize * pageIndex && index >= pageSize * (pageIndex - 1)
-      )
-
-      return {
-        code: SUCCESS_CODE,
-        data: {
-          total: mockList.length,
-          list: pageList
-        }
-      }
-    }
-  },
   // 登录接口
   {
     url: '/mock/user/login',
@@ -57,21 +24,16 @@ export default [
     timeout,
     response: ({ body }) => {
       const data = body
-      let hasUser = false
-      for (const user of List) {
-        if (user.username === data.username && user.password === data.password) {
-          hasUser = true
-          return {
-            code: SUCCESS_CODE,
-            data: user
-          }
+      if (!simpleUserMap.has(data.username)) {
+        return {
+          code: '50001',
+          message: '账号不存在'
         }
       }
-      if (!hasUser) {
-        return {
-          code: 500,
-          message: '账号或密码错误'
-        }
+      return {
+        code: SUCCESS_CODE,
+        message: 'success',
+        data: { token: simpleUserMap.get(data.username)?.token }
       }
     }
   },
@@ -83,7 +45,28 @@ export default [
     response: () => {
       return {
         code: SUCCESS_CODE,
+        message: 'success',
         data: null
+      }
+    }
+  },
+  // mock/user/info
+  {
+    url: '/mock/user/info',
+    method: 'get',
+    timeout,
+    response: (request: any) => {
+      const token = request.headers.token
+      if (simpleTokenUserMap.has(token)) {
+        return {
+          code: SUCCESS_CODE,
+          message: 'success',
+          data: simpleTokenUserMap.get(token)
+        }
+      }
+      return {
+        code: '50002',
+        message: 'token无效'
       }
     }
   }

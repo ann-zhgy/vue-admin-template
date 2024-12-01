@@ -3,12 +3,12 @@ import type {
   Router,
   RouteLocationNormalized,
   RouteRecordNormalized,
-  RouteRecordRaw
+  RouteRecordRaw,
+  RouteMeta
 } from 'vue-router'
 import { isUrl } from '@/utils/is'
 import { omit, cloneDeep } from 'lodash-es'
-
-const modules = import.meta.glob('../views/**/*.{vue,tsx}')
+import { MenuInfo } from '@/api/login/types'
 
 /* Layout */
 export const Layout = () => import('@/layout/Layout.vue')
@@ -38,84 +38,109 @@ export const getRawRoute = (route: RouteLocationNormalized): RouteLocationNormal
 }
 
 // 前端控制路由生成
-export const generateRoutesByFrontEnd = (
+export const generateRoutesByNoneAuthorizeModel = (
   routes: AppRouteRecordRaw[],
-  keys: string[],
   basePath = '/'
 ): AppRouteRecordRaw[] => {
   const res: AppRouteRecordRaw[] = []
 
   for (const route of routes) {
-    const meta = route.meta ?? {}
-    // skip some route
-    if (meta.hidden && !meta.canTo) {
-      continue
-    }
+    const meta: RouteMeta = route.meta ?? {}
 
-    let data: Nullable<AppRouteRecordRaw> = null
-
-    let onlyOneChild: Nullable<string> = null
-    if (route.children && route.children.length === 1 && !meta.alwaysShow) {
-      onlyOneChild = (
-        isUrl(route.children[0].path)
-          ? route.children[0].path
-          : pathResolve(pathResolve(basePath, route.path), route.children[0].path)
-      ) as string
-    }
-
-    // 开发者可以根据实际情况进行扩展
-    for (const item of keys) {
-      // 通过路径去匹配
-      if (isUrl(item) && (onlyOneChild === item || route.path === item)) {
-        data = Object.assign({}, route)
-      } else {
-        const routePath = (onlyOneChild ?? pathResolve(basePath, route.path)).trim()
-        if (routePath === item || meta.followRoute === item) {
-          data = Object.assign({}, route)
-        }
+    const data: AppRouteRecordRaw = Object.assign({}, route)
+    // 如果路由是具体的页面，就做权限校验
+    if (!route.redirect) {
+      if (meta.showInStatic !== undefined && meta.showInStatic === false) {
+        continue
       }
     }
-
-    // recursive child routes
-    if (route.children && data) {
-      data.children = generateRoutesByFrontEnd(
+    // 如果路由是菜单的中间节点，找有权限的子节点
+    else if (route.children) {
+      data.children = generateRoutesByNoneAuthorizeModel(
         route.children,
-        keys,
         pathResolve(basePath, data.path)
       )
     }
-    if (data) {
+    // 走到这里意味着菜单是有权限的页面或者可能有有权限的子节点
+    // 如果是有权限的页面，或者是子节点有页面的中间节点，就push到res中
+    if (!data.redirect || (data.children && data.children.length > 0)) {
       res.push(data as AppRouteRecordRaw)
     }
   }
   return res
 }
 
-// 后端控制路由生成
-export const generateRoutesByServer = (routes: AppCustomRouteRecordRaw[]): AppRouteRecordRaw[] => {
+// 简单权限模型控制路由生成
+export const generateRoutesBySimpleAuthorizeModel = (
+  routes: AppRouteRecordRaw[],
+  permissions: string[],
+  basePath = '/'
+): AppRouteRecordRaw[] => {
+  const res: AppRouteRecordRaw[] = []
+
+  const permissionSet = new Set(permissions)
+
+  for (const route of routes) {
+    const meta = route.meta ?? {}
+    if (!meta.permission) {
+      console.warn(`route ${route.path} no permission`)
+      continue
+    }
+
+    const data: AppRouteRecordRaw = Object.assign({}, route)
+    // 如果路由是具体的页面，就做权限校验
+    if (!route.redirect) {
+      const samePermission = Array.from(
+        new Set([...meta.permission].filter((x) => permissionSet.has(x)))
+      )
+      if (samePermission.length === 0) {
+        continue
+      }
+    }
+    // 如果路由是菜单的中间节点，找有权限的子节点
+    else if (route.children) {
+      data.children = generateRoutesBySimpleAuthorizeModel(
+        route.children,
+        permissions,
+        pathResolve(basePath, data.path)
+      )
+    }
+    // 走到这里意味着菜单是有权限的页面或者可能有有权限的子节点
+    // 如果是有权限的页面，或者是子节点有页面的中间节点，就push到res中
+    if (!data.redirect || (data.children && data.children.length > 0)) {
+      res.push(data as AppRouteRecordRaw)
+    }
+  }
+  return res
+}
+
+// RBAC控制路由生成
+export const generateRoutesByRBACAuthorizeModel = (
+  routes: AppRouteRecordRaw[],
+  menus: MenuInfo[]
+): AppRouteRecordRaw[] => {
+  const menuMap = new Map(menus.map((value) => [value.key, value]))
+  return doGenerateRoutesByRBACAuthorizeModel(routes, menuMap)
+}
+
+export const doGenerateRoutesByRBACAuthorizeModel = (
+  routes: AppRouteRecordRaw[],
+  menuMap: Map<string, MenuInfo>
+): AppRouteRecordRaw[] => {
   const res: AppRouteRecordRaw[] = []
 
   for (const route of routes) {
-    const data: AppRouteRecordRaw = {
-      path: route.path,
-      name: route.name,
-      redirect: route.redirect,
-      meta: route.meta
+    if (!menuMap.has(route.name)) {
+      continue
     }
-    if (route.component) {
-      const comModule = modules[`../${route.component}.vue`] || modules[`../${route.component}.tsx`]
-      const component = route.component as string
-      if (!comModule && !component.includes('#')) {
-        console.error(`未找到${route.component}.vue文件或${route.component}.tsx文件，请创建`)
-      } else {
-        // 动态加载路由文件，可根据实际情况进行自定义逻辑
-        data.component =
-          component === '#' ? Layout : component.includes('##') ? getParentLayout() : comModule
-      }
+    const data: AppRouteRecordRaw = { ...route }
+    const menuInfo = menuMap.get(route.name)
+    if (menuInfo?.title) {
+      data.meta.title = menuInfo.title
     }
     // recursive child routes
     if (route.children) {
-      data.children = generateRoutesByServer(route.children)
+      data.children = doGenerateRoutesByRBACAuthorizeModel(route.children, menuMap)
     }
     res.push(data as AppRouteRecordRaw)
   }
