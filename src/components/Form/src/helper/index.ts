@@ -28,7 +28,7 @@ export const setTextPlaceholder = (schema: FormSchema): PlaceholderModel => {
   ]
   if (textMap.includes(schema?.component as ComponentNameEnum)) {
     return {
-      placeholder: t('common.inputText')
+      placeholder: t('components.form.inputText')
     }
   }
   if (selectMap.includes(schema?.component as ComponentNameEnum)) {
@@ -41,13 +41,13 @@ export const setTextPlaceholder = (schema: FormSchema): PlaceholderModel => {
       )
     ) {
       return {
-        startPlaceholder: t('common.startTimeText'),
-        endPlaceholder: t('common.endTimeText'),
+        startPlaceholder: t('components.form.startTimeText'),
+        endPlaceholder: t('components.form.endTimeText'),
         rangeSeparator: '-'
       }
     } else {
       return {
-        placeholder: t('common.selectText')
+        placeholder: t('components.form.selectText')
       }
     }
   }

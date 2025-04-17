@@ -47,7 +47,7 @@ declare global {
 
   declare interface BaseResponse<T = any> {
     code: string
-    mesage: string
+    message: string
     data: T extends any ? T : T & any
   }
 
@@ -67,4 +67,6 @@ declare global {
     topHeaderHoverColor?: string
     topToolBorderColor?: string
   }
+
+  declare type JsonObject = Record<string, any>
 }

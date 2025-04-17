@@ -57,14 +57,14 @@ export const useAppStore = defineStore('app', {
       screenfull: true, // 全屏图标
       size: true, // 尺寸图标
       locale: true, // 多语言图标
-      tagsView: true, // 标签页
+      tagsView: false, // 标签页
       tagsViewIcon: true, // 是否显示标签图标
       logo: true, // logo
       fixedHeader: true, // 固定toolheader
-      footer: true, // 显示页脚
+      footer: false, // 显示页脚
       greyMode: false, // 是否开始灰色模式，用于特殊悼念日
       dynamicRouter: true, // 是否动态路由
-      authorizeModel: AuthorizeModel.SIMPLE, // 权限模型
+      authorizeModel: AuthorizeModel.RBAC, // 权限模型
       fixedMenu: false, // 是否固定菜单
 
       layout: 'classic', // layout布局
@@ -337,7 +337,7 @@ export const useAppStore = defineStore('app', {
       isDark.value = this.getIsDark
     }
   },
-  persist: true
+  persist: false
 })
 
 export const useAppStoreWithOut = () => {

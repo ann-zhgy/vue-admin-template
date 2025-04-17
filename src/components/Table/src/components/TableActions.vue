@@ -73,7 +73,7 @@ export default defineComponent({
                         return unref(sizeMap).map((v) => {
                           return (
                             <ElDropdownItem key={v} command={v}>
-                              {t(`size.${v}`)}
+                              {t(`components.size.${v}`)}
                             </ElDropdownItem>
                           )
                         })

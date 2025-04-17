@@ -155,14 +155,14 @@ export const useTable = (config: UseTableConfig) => {
         console.warn('fetchDelApi is undefined')
         return
       }
-      ElMessageBox.confirm(t('common.delMessage'), t('common.delWarning'), {
-        confirmButtonText: t('common.delOk'),
-        cancelButtonText: t('common.delCancel'),
+      ElMessageBox.confirm(t('components.table.delMessage'), t('components.table.delWarning'), {
+        confirmButtonText: t('common.ok'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }).then(async () => {
         const res = await fetchDelApi()
         if (res) {
-          ElMessage.success(t('common.delSuccess'))
+          ElMessage.success(t('components.table.delSuccess'))
 
           // 计算出临界点
           const current =

@@ -27,7 +27,7 @@ export default defineComponent({
       default: (): DivProps => {
         return {
           backgroundColor: 'antiquewhite',
-          height: 500,
+          height: '500px',
           width: '100%'
         }
       }
@@ -56,12 +56,13 @@ export default defineComponent({
             // console.log(atom)
             // atom 行的具体含义 https://blog.csdn.net/weixin_40013463/article/details/81735304
             if (atom.pdbline) ElMessage.info(atom.pdbline)
-            if (atom.resn && atom.atom)
+            if (atom.resn && atom.atom && atom.x && atom.y && atom.z) {
               viewer.addLabel(atom.resn + ':' + atom.atom, {
-                position: atom,
+                position: { x: atom.x, y: atom.y, z: atom.z },
                 backgroundColor: 'darkgreen',
                 backgroundOpacity: 0.6
               })
+            }
           }
         }
       }
@@ -97,12 +98,22 @@ export default defineComponent({
       }
     )
     const view = (data: any, fileType: SupportedType, viewerProps: ViewerProps) => {
-      let viewer1: GLViewer = $3Dmol.createViewer(document.getElementById('container-01'), {
+      const containerEle = document.getElementById('container-01')
+      containerEle?.childNodes.forEach((item) => containerEle?.removeChild(item))
+      const viewerEle = document.createElement('div')
+      viewerEle.setAttribute('class', 'viewer_3Dmoljs')
+      viewerEle.setAttribute('data-style', 'stick')
+      viewerEle.setAttribute('data-ui', 'true')
+      viewerEle.style.height = divProps.value.height
+      viewerEle.style.width = divProps.value.width
+      viewerEle.style.backgroundColor = divProps.value.backgroundColor
+      containerEle?.appendChild(viewerEle)
+      let viewer1: GLViewer = $3Dmol.createViewer(viewerEle, {
         backgroundColor: viewerProps.backgroundColor,
         backgroundAlpha: viewerProps.backgroundAlpha ?? 0
       } as ViewerSpec)
       if (!viewer1) {
-        ElMessage.error(t('mol3dViewer.initFail'))
+        ElMessage.error(t('components.mol3dViewer.initFail'))
         return
       }
       viewer1.addModel(data, fileType)
@@ -126,14 +137,11 @@ export default defineComponent({
       <div
         id="container-01"
         style={{
-          height: divProps.value.height + 'px',
+          height: divProps.value.height,
           width: divProps.value.width,
           position: 'relative',
           backgroundColor: divProps.value.backgroundColor
         }}
-        class="viewer_3Dmoljs"
-        data-style="stick"
-        data-ui="true"
       ></div>
     )
   }

@@ -1,4 +1,11 @@
-import { AtomSelectionSpec, AtomSpec, AtomStyleSpec, SurfaceStyleSpec, SurfaceType } from '3dmol'
+import {
+  AtomSelectionSpec,
+  AtomSpec,
+  AtomStyleSpec,
+  GLViewer,
+  SurfaceStyleSpec,
+  SurfaceType
+} from '3dmol'
 
 export enum SupportedType {
   PDB = 'pdb',
@@ -18,8 +25,8 @@ export enum SupportedType {
 
 export interface DivProps {
   backgroundColor: string
-  width: number | string
-  height: number
+  width: string
+  height: string
 }
 
 export interface SurfaceProps {
@@ -38,5 +45,5 @@ export interface ViewerProps {
   // 3d图形中的基础元素的样式配置，
   atomStyle: AtomStyleSpec
   surface?: SurfaceProps
-  atomClickCallback?: (atom: AtomSpec, viewer) => void
+  atomClickCallback?: (atom: AtomSpec, viewer: GLViewer) => void
 }

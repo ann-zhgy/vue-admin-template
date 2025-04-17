@@ -356,14 +356,16 @@ export default defineComponent({
             id="contextmenu"
           >
             <ElPopconfirm
-              title={t('editableTable.popconfirmTitle')}
+              title={t('components.editableTable.popconfirmTitle')}
               onConfirm={delRow}
               teleported={false}
               onCancel={() => (tableEditState.value.showMenu = false)}
             >
               {{
                 reference: () => (
-                  <ElButton type="primary">{t('editableTable.popconfirmButtonContent')}</ElButton>
+                  <ElButton type="primary">
+                    {t('components.editableTable.popconfirmButtonContent')}
+                  </ElButton>
                 )
               }}
             </ElPopconfirm>

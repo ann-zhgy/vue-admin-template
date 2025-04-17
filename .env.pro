@@ -1,3 +1,5 @@
+VITE_APP_KEY=admin-template
+
 # 环境
 VITE_NODE_ENV=production
 
@@ -17,7 +19,7 @@ VITE_DROP_CONSOLE=true
 VITE_SOURCEMAP=false
 
 # 输出路径
-VITE_OUT_DIR=dist-pro
+VITE_OUT_DIR=dist
 
 # 标题
 VITE_APP_TITLE=ElementAdmin

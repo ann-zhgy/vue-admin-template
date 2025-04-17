@@ -98,6 +98,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           'vue',
           'vue-router',
           // 其他需要自动导入的库
+          'pinia'
         ],
         resolvers: [ElementPlusResolver()],
         dts: 'auto-imports.d.ts',

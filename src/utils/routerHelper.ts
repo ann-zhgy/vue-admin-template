@@ -8,7 +8,8 @@ import type {
 } from 'vue-router'
 import { isUrl } from '@/utils/is'
 import { omit, cloneDeep } from 'lodash-es'
-import { MenuInfo } from '@/api/login/types'
+import { MenuInfo } from '@/api/authorization/login/types'
+import { AuthorizeModel } from '@/store/modules/app'
 
 /* Layout */
 export const Layout = () => import('@/layout/Layout.vue')
@@ -50,7 +51,7 @@ export const generateRoutesByNoneAuthorizeModel = (
     const data: AppRouteRecordRaw = Object.assign({}, route)
     // 如果路由是具体的页面，就做权限校验
     if (!route.redirect) {
-      if (meta.showInStatic !== undefined && meta.showInStatic === false) {
+      if (meta.showIn !== undefined && meta.showIn.indexOf('static') === -1) {
         continue
       }
     }
@@ -63,7 +64,7 @@ export const generateRoutesByNoneAuthorizeModel = (
     }
     // 走到这里意味着菜单是有权限的页面或者可能有有权限的子节点
     // 如果是有权限的页面，或者是子节点有页面的中间节点，就push到res中
-    if (!data.redirect || (data.children && data.children.length > 0)) {
+    if (!data.children || data.children.length > 0) {
       res.push(data as AppRouteRecordRaw)
     }
   }
@@ -81,15 +82,18 @@ export const generateRoutesBySimpleAuthorizeModel = (
   const permissionSet = new Set(permissions)
 
   for (const route of routes) {
-    const meta = route.meta ?? {}
-    if (!meta.permission) {
-      console.warn(`route ${route.path} no permission`)
-      continue
-    }
+    const meta: RouteMeta = route.meta ?? {}
 
     const data: AppRouteRecordRaw = Object.assign({}, route)
     // 如果路由是具体的页面，就做权限校验
-    if (!route.redirect) {
+    if (!route.children) {
+      if (meta.showIn !== undefined && meta.showIn.indexOf(AuthorizeModel.SIMPLE) === -1) {
+        continue
+      }
+      if (!meta.permission) {
+        console.warn(`route ${route.path} no permission`)
+        continue
+      }
       const samePermission = Array.from(
         new Set([...meta.permission].filter((x) => permissionSet.has(x)))
       )
@@ -98,7 +102,7 @@ export const generateRoutesBySimpleAuthorizeModel = (
       }
     }
     // 如果路由是菜单的中间节点，找有权限的子节点
-    else if (route.children) {
+    else {
       data.children = generateRoutesBySimpleAuthorizeModel(
         route.children,
         permissions,
@@ -107,7 +111,7 @@ export const generateRoutesBySimpleAuthorizeModel = (
     }
     // 走到这里意味着菜单是有权限的页面或者可能有有权限的子节点
     // 如果是有权限的页面，或者是子节点有页面的中间节点，就push到res中
-    if (!data.redirect || (data.children && data.children.length > 0)) {
+    if (!data.children || data.children.length > 0) {
       res.push(data as AppRouteRecordRaw)
     }
   }
@@ -130,19 +134,28 @@ export const doGenerateRoutesByRBACAuthorizeModel = (
   const res: AppRouteRecordRaw[] = []
 
   for (const route of routes) {
-    if (!menuMap.has(route.name)) {
-      continue
-    }
     const data: AppRouteRecordRaw = { ...route }
-    const menuInfo = menuMap.get(route.name)
-    if (menuInfo?.title) {
-      data.meta.title = menuInfo.title
+    const meta = route.meta
+    // 如果路由是具体的页面，就做权限校验
+    if (!route.children) {
+      if (meta.showIn !== undefined && meta.showIn.indexOf(AuthorizeModel.RBAC) === -1) {
+        continue
+      }
+      if (!menuMap.has(route.name)) {
+        continue
+      }
+      // 如果是有权限的页面，就设置containerComponentKeys
+      data.meta.containerComponentKeys = menuMap.get(route.name)?.innerComponentKeys
     }
     // recursive child routes
-    if (route.children) {
+    else {
       data.children = doGenerateRoutesByRBACAuthorizeModel(route.children, menuMap)
     }
-    res.push(data as AppRouteRecordRaw)
+    // 走到这里意味着菜单是有权限的页面或者可能有有权限的子节点
+    // 如果是有权限的页面，或者是子节点有页面的中间节点，就push到res中
+    if (!data.children || data.children.length > 0) {
+      res.push(data as AppRouteRecordRaw)
+    }
   }
   return res
 }

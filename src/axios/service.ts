@@ -35,7 +35,7 @@ axiosInstance.interceptors.response.use(
     return res
   },
   (error: AxiosError) => {
-    console.log('err： ' + error) // for debug
+    console.debug('err: ' + error) // for debug
     ElMessage.error(error.message)
     return Promise.reject(error)
   }
@@ -54,7 +54,7 @@ const service = {
       axiosInstance
         .request(config)
         .then((res) => {
-          resolve(res)
+          resolve(res.data)
         })
         .catch((err: any) => {
           reject(err)

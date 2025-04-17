@@ -23,6 +23,7 @@ import {
 import { InputPassword } from '@/components/InputPassword'
 import { Editor } from '@/components/Editor'
 import { ComponentName } from '../types'
+import ScrollRemoteSeletor from '@/components/ScrollRemoteSeletor/src/ScrollRemoteSeletor.vue'
 
 const componentMap: Recordable<Component, ComponentName> = {
   RadioGroup: ElRadioGroup,
@@ -44,6 +45,7 @@ const componentMap: Recordable<Component, ComponentName> = {
   Divider: ElDivider,
   TimeSelect: ElTimeSelect,
   SelectV2: ElSelectV2,
+  ScrollRemote_selector: ScrollRemoteSeletor,
   InputPassword: InputPassword,
   Editor: Editor,
   TreeSelect: ElTreeSelect,

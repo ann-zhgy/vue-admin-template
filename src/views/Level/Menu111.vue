@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useI18n } from '@/hooks/web/useI18n'
 import { ref } from 'vue'
 import { random } from 'lodash-es'
 import { EditableTable, EditableTableColumn } from '@/components/EditableTable'
+import { ElMessage } from 'element-plus'
+import { CaptchaType, VerifyComponent } from '@/components/Verifition/src/types'
 
 defineOptions({
   name: 'Menu111'
 })
-
-const { t } = useI18n()
 
 const text = ref('')
 
@@ -28,15 +27,25 @@ const changeTable = () => {
     { title: 'wew', content: '5454' }
   ]
 }
+
+const verifyRef = ref<VerifyComponent | null>(null)
+const initVerify = () => {
+  verifyRef.value?.init()
+}
 </script>
 
 <template>
-  <content-wrap :title="t('levelDemo.menu')">
+  <content-wrap title="menu111">
     <div class="flex items-center"> Menu111: <ElInput v-model="text" class="pl-20px" /> </div>
   </content-wrap>
-  <!-- <div style="margin-top: 24px">
-    <verify :captcha-type="CaptchaType.WORD_IMAGE_CLICK" @next="ElMessage.info('success')" />
-  </div> -->
+  <div style="margin-top: 24px">
+    <el-button @click="initVerify">校验器</el-button>
+    <verify
+      ref="verifyRef"
+      :captcha-type="CaptchaType.WORD_IMAGE_CLICK"
+      @next="ElMessage.info('success')"
+    />
+  </div>
   <div style="margin-top: 24px">
     <el-row>
       <el-table border v-model:data="tableData">

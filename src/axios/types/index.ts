@@ -20,6 +20,24 @@ interface RequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: RequestInterceptors<T>
 }
 
+interface PageResult<T> {
+  pageNum: number
+  pageSize: number
+  totalCount: number
+  totalPage: number
+  items: T[]
+}
+
+interface PageRequest {
+  pageNo: number
+  pageSize: number
+}
+
+enum CommonStatus {
+  ENABLE = 'enable',
+  DISABLE = 'disable'
+}
+
 export {
   AxiosResponse,
   RequestInterceptors,
@@ -27,5 +45,8 @@ export {
   AxiosInstance,
   InternalAxiosRequestConfig,
   AxiosRequestHeaders,
-  AxiosError
+  AxiosError,
+  PageRequest,
+  PageResult,
+  CommonStatus
 }

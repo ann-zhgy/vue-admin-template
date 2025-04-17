@@ -8,7 +8,7 @@ import {
 } from '@/utils/routerHelper'
 import { store } from '../index'
 import { cloneDeep } from 'lodash-es'
-import { MenuInfo } from '@/api/login/types'
+import { MenuInfo } from '@/api/authorization/login/types'
 import { AuthorizeModel } from './app'
 
 export interface PermissionState {
@@ -92,10 +92,10 @@ export const usePermissionStore = defineStore('permission', {
       this.routers = cloneDeep(constantRouterMap)
       this.addRouters = []
     }
-  },
-  persist: {
-    paths: ['routers', 'addRouters', 'menuTabRouters']
   }
+  // persist: {
+  //   paths: ['routers', 'addRouters', 'menuTabRouters']
+  // }
 })
 
 export const usePermissionStoreWithOut = () => {

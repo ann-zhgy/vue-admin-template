@@ -133,11 +133,11 @@ const copyConfig = async () => {
     legacy: true
   })
   if (!isSupported) {
-    ElMessage.error(t('setting.copyFailed'))
+    ElMessage.error(t('components.setting.copyFailed'))
   } else {
     await copy()
     if (unref(copied)) {
-      ElMessage.success(t('setting.copySuccess'))
+      ElMessage.success(t('components.setting.copySuccess'))
     }
   }
 }
@@ -166,20 +166,20 @@ const themeChange = () => {
 
   <ElDrawer v-model="drawer" direction="rtl" size="350px" :z-index="4000">
     <template #header>
-      <span class="text-16px font-700">{{ t('setting.projectSetting') }}</span>
+      <span class="text-16px font-700">{{ t('components.setting.projectSetting') }}</span>
     </template>
 
     <div class="text-center">
       <!-- 主题 -->
-      <ElDivider>{{ t('setting.theme') }}</ElDivider>
+      <ElDivider>{{ t('components.setting.theme') }}</ElDivider>
       <ThemeSwitch @change="themeChange" />
 
       <!-- 布局 -->
-      <ElDivider>{{ t('setting.layout') }}</ElDivider>
+      <ElDivider>{{ t('components.setting.layout') }}</ElDivider>
       <LayoutRadioPicker />
 
       <!-- 系统主题 -->
-      <ElDivider>{{ t('setting.systemTheme') }}</ElDivider>
+      <ElDivider>{{ t('components.setting.systemTheme') }}</ElDivider>
       <ColorRadioPicker
         v-model="systemTheme"
         :schema="[
@@ -196,7 +196,7 @@ const themeChange = () => {
       />
 
       <!-- 头部主题 -->
-      <ElDivider>{{ t('setting.headerTheme') }}</ElDivider>
+      <ElDivider>{{ t('components.setting.headerTheme') }}</ElDivider>
       <ColorRadioPicker
         v-model="headerTheme"
         :schema="[
@@ -213,7 +213,7 @@ const themeChange = () => {
       />
 
       <!-- 菜单主题 -->
-      <ElDivider>{{ t('setting.menuTheme') }}</ElDivider>
+      <ElDivider>{{ t('components.setting.menuTheme') }}</ElDivider>
       <ColorRadioPicker
         v-model="menuTheme"
         :schema="[
@@ -231,18 +231,18 @@ const themeChange = () => {
     </div>
 
     <!-- 界面显示 -->
-    <ElDivider>{{ t('setting.interfaceDisplay') }}</ElDivider>
+    <ElDivider>{{ t('components.setting.interfaceDisplay') }}</ElDivider>
     <InterfaceDisplay />
 
     <ElDivider />
     <div>
       <BaseButton type="primary" class="w-full" @click="copyConfig">{{
-        t('setting.copy')
+        t('components.setting.copy')
       }}</BaseButton>
     </div>
     <div class="mt-5px">
       <BaseButton type="danger" class="w-full" @click="clear">
-        {{ t('setting.clearAndReset') }}
+        {{ t('components.setting.clearAndReset') }}
       </BaseButton>
     </div>
   </ElDrawer>

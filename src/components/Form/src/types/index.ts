@@ -22,6 +22,10 @@ import {
 } from 'element-plus'
 import { IEditorConfig } from '@wangeditor/editor'
 import { CSSProperties } from 'vue'
+import {
+  ScrollRemoteSelectorEmits,
+  ScrollRemoteSelectorProps
+} from '@/components/ScrollRemoteSeletor/src/types'
 
 export interface PlaceholderModel {
   placeholder?: string
@@ -39,6 +43,7 @@ export enum ComponentNameEnum {
   AUTOCOMPLETE = 'Autocomplete',
   INPUT_NUMBER = 'InputNumber',
   SELECT = 'Select',
+  SCROLL_REMOTE_SELECTOR = 'ScrollRemote_selector',
   CASCADER = 'Cascader',
   SWITCH = 'Switch',
   SLIDER = 'Slider',
@@ -148,6 +153,14 @@ export interface SelectComponentProps extends Omit<Partial<ISelectProps>, 'optio
     empty?: (...args: any[]) => JSX.Element | null
   }
   options?: SelectOption[]
+  style?: CSSProperties
+}
+
+export interface ScrollRemoteSelectorComponentProps extends ScrollRemoteSelectorProps {
+  on?: ScrollRemoteSelectorEmits
+  slots?: {
+    default?: (option: SelectOption) => JSX.Element | null
+  }
   style?: CSSProperties
 }
 
@@ -606,6 +619,7 @@ export interface FormSchema {
     | InputNumberComponentProps
     | SelectComponentProps
     | SelectV2ComponentProps
+    | ScrollRemoteSelectorComponentProps
     | CascaderComponentProps
     | SwitchComponentProps
     | RateComponentProps

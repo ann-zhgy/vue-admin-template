@@ -1,10 +1,22 @@
-import { SimpleUserInfo } from '@/api/login/types'
+import { SimpleUserInfo } from '@/api/authorization/login/types'
+import { SimplePermission } from '@/api/authorization/user/simple/types'
+import { CommonStatus } from '@/axios/types'
 import { SUCCESS_CODE } from '@/constants'
 
 const timeout = 1000
 
-const simpleUserAdmin: SimpleUserInfo = { username: 'admin', permissions: ['admin', 'basic'] }
-const simpleUserTest: SimpleUserInfo = { username: 'test', permissions: ['basic'] }
+const simpleUserAdmin: SimpleUserInfo = {
+  username: 'admin',
+  permission: [SimplePermission.ADMIN, SimplePermission.BASIC],
+  id: 1,
+  status: CommonStatus.ENABLE
+}
+const simpleUserTest: SimpleUserInfo = {
+  username: 'test',
+  permission: [SimplePermission.BASIC],
+  id: 2,
+  status: CommonStatus.ENABLE
+}
 
 const simpleUserMap: Map<string, { token: string; userInfo: SimpleUserInfo }> = new Map([
   ['admin', { token: 'admin-token', userInfo: simpleUserAdmin }],

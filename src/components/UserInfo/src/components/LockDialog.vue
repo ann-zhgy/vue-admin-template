@@ -36,7 +36,7 @@ const dialogVisible = computed({
   }
 })
 
-const dialogTitle = ref(t('lock.lockScreen'))
+const dialogTitle = ref(t('components.lock.lockScreen'))
 
 const rules = reactive({
   password: [required()]
@@ -44,7 +44,7 @@ const rules = reactive({
 
 const schema: FormSchema[] = reactive([
   {
-    label: t('lock.lockPassword'),
+    label: t('components.lock.lockPassword'),
     field: 'password',
     component: 'Input',
     componentProps: {
@@ -87,7 +87,7 @@ const handleLock = async () => {
     </div>
     <Form :is-col="false" :schema="schema" :rules="rules" @register="formRegister" />
     <template #footer>
-      <ElButton type="primary" @click="handleLock">{{ t('lock.lock') }}</ElButton>
+      <ElButton type="primary" @click="handleLock">{{ t('components.lock.lock') }}</ElButton>
     </template>
   </Dialog>
 </template>

@@ -3,19 +3,12 @@ import type { RouteRecordRaw } from 'vue-router'
 import type { App } from 'vue'
 import { Layout, getParentLayout } from '@/utils/routerHelper'
 import { useI18n } from '@/hooks/web/useI18n'
+import { AuthorizeModel } from '@/store/modules/app'
+import { SimplePermission } from '@/api/authorization/user/simple/types'
 
 const { t } = useI18n()
 
 export const constantRouterMap: AppRouteRecordRaw[] = [
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/level',
-    name: 'Root',
-    meta: {
-      hidden: true
-    }
-  },
   {
     path: '/redirect',
     component: Layout,
@@ -35,7 +28,7 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import('@/views/Login/Login.vue'),
+    component: () => import('@/views/Login/LoginHome.vue'),
     name: 'Login',
     meta: {
       hidden: true,
@@ -57,14 +50,89 @@ export const constantRouterMap: AppRouteRecordRaw[] = [
 
 export const asyncRouterMap: AppRouteRecordRaw[] = [
   {
+    path: '/author',
+    component: Layout,
+    name: 'Author',
+    redirect: '/author/user-list',
+    meta: {
+      title: t('router.authorization'),
+      icon: 'carbon:id-management'
+    },
+    children: [
+      {
+        path: 'user-list',
+        name: 'SimpleUserList',
+        component: () => import('@/views/Authorization/User/simple/UserList.vue'),
+        meta: {
+          title: t('router.userManagement'),
+          showIn: [AuthorizeModel.SIMPLE],
+          permission: [SimplePermission.SUPER_ADMIN]
+        }
+      },
+      {
+        path: 'user-list',
+        name: 'RbacUserList',
+        component: () => import('@/views/Authorization/User/rbac/UserList.vue'),
+        meta: {
+          title: t('router.userManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      },
+      {
+        path: 'role-list',
+        name: 'RoleList',
+        component: () => import('@/views/Authorization/Role/RoleList.vue'),
+        meta: {
+          title: t('router.roleManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      },
+      {
+        path: 'menu-list',
+        name: 'MenuList',
+        component: () => import('@/views/Authorization/Menu/MenuList.vue'),
+        meta: {
+          title: t('router.menuManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      },
+      {
+        path: 'function-group-list',
+        name: 'FunctionGroupList',
+        component: () => import('@/views/Authorization/Function/Group/FunctionGroupList.vue'),
+        meta: {
+          title: t('router.functionGroupManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      },
+      {
+        path: 'function-list',
+        name: 'FunctionList',
+        component: () => import('@/views/Authorization/Function/FunctionList.vue'),
+        meta: {
+          title: t('router.functionManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      },
+      {
+        path: 'app-info-list',
+        name: 'AppInfoList',
+        component: () => import('@/views/Authorization/AppInfo/AppInfoList.vue'),
+        meta: {
+          title: t('router.appInfoManagement'),
+          showIn: [AuthorizeModel.RBAC]
+        }
+      }
+    ]
+  },
+  {
     path: '/level',
     component: Layout,
     redirect: '/level/menu1/menu1-1/menu1-1-1',
     name: 'Level',
     meta: {
       title: t('router.level'),
-      icon: 'carbon:skill-level-advanced',
-      permission: ['admin', 'basic']
+      icon: 'carbon:skill-level-advanced'
     },
     children: [
       {
@@ -73,8 +141,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         component: getParentLayout(),
         redirect: '/level/menu1/menu1-1/menu1-1-1',
         meta: {
-          title: t('router.menu1'),
-          permission: ['admin', 'basic']
+          title: t('router.menu1')
         },
         children: [
           {
@@ -84,8 +151,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
             redirect: '/level/menu1/menu1-1/menu1-1-1',
             meta: {
               title: t('router.menu11'),
-              alwaysShow: true,
-              permission: ['admin', 'basic']
+              alwaysShow: true
             },
             children: [
               {
@@ -94,7 +160,11 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
                 component: () => import('@/views/Level/Menu111.vue'),
                 meta: {
                   title: t('router.menu111'),
-                  permission: ['admin', 'basic']
+                  permission: [
+                    SimplePermission.BASIC,
+                    SimplePermission.ADMIN,
+                    SimplePermission.SUPER_ADMIN
+                  ]
                 }
               }
             ]
@@ -105,7 +175,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
             component: () => import('@/views/Level/Menu12.vue'),
             meta: {
               title: t('router.menu12'),
-              permission: ['admin']
+              permission: [SimplePermission.ADMIN]
             }
           }
         ]
@@ -116,8 +186,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
         component: () => import('@/views/Level/Menu2.vue'),
         meta: {
           title: t('router.menu2'),
-          permission: ['admin'],
-          showInStatic: false
+          permission: [SimplePermission.ADMIN]
         }
       }
     ]

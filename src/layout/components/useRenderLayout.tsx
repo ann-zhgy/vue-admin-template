@@ -83,6 +83,7 @@ export const useRenderLayout = () => {
                   fixedHeader.value
               }
             ]}
+            style={!tagsView.value ? { 'margin-top': '60px' } : {}}
           >
             <div
               class={[

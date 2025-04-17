@@ -19,18 +19,18 @@ const errorMap: {
 } = {
   '404': {
     url: pageError,
-    message: t('error.pageError'),
-    buttonText: t('error.returnToHome')
+    message: t('components.error.pageError'),
+    buttonText: t('components.error.returnToHome')
   },
   '500': {
     url: networkError,
-    message: t('error.networkError'),
-    buttonText: t('error.returnToHome')
+    message: t('components.error.networkError'),
+    buttonText: t('components.error.returnToHome')
   },
   '403': {
     url: noPermission,
-    message: t('error.noPermission'),
-    buttonText: t('error.returnToHome')
+    message: t('components.error.noPermission'),
+    buttonText: t('components.error.returnToHome')
   }
 }
 

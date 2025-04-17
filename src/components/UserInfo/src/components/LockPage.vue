@@ -9,7 +9,7 @@ import { useI18n } from '@/hooks/web/useI18n'
 import { useNow } from '@/hooks/web/useNow'
 import { useDesign } from '@/hooks/web/useDesign'
 import { Icon } from '@/components/Icon'
-import { loginOutApi } from '@/api/login'
+import { logoutApi } from '@/api/authorization/login'
 import { useTagsViewStore } from '@/store/modules/tagsView'
 
 const tagsViewStore = useTagsViewStore()
@@ -49,14 +49,12 @@ async function unLock() {
 
 // 返回登录
 async function goLogin() {
-  const res = await loginOutApi().catch(() => {})
-  if (res) {
-    clear()
-    tagsViewStore.delAllViews()
-    resetRouter() // 重置静态路由表
-    lockStore.resetLockInfo()
-    replace('/login')
-  }
+  await logoutApi().catch(() => {})
+  clear()
+  tagsViewStore.delAllViews()
+  resetRouter() // 重置静态路由表
+  lockStore.resetLockInfo()
+  replace('/login')
 }
 
 function handleShowForm(show = false) {
@@ -76,7 +74,7 @@ function handleShowForm(show = false) {
       v-show="showDate"
     >
       <Icon icon="ep:lock" />
-      <span>{{ t('lock.unlock') }}</span>
+      <span>{{ t('components.lock.unlock') }}</span>
     </div>
 
     <div class="flex w-screen h-screen justify-center items-center">
@@ -99,12 +97,12 @@ function handleShowForm(show = false) {
           </div>
           <ElInput
             type="password"
-            :placeholder="t('lock.placeholder')"
+            :placeholder="t('components.lock.placeholder')"
             class="enter-x"
             v-model="password"
           />
           <span :class="`text-14px ${prefixCls}-entry__err-msg enter-x`" v-if="errMsg">
-            {{ t('lock.message') }}
+            {{ t('components.lock.message') }}
           </span>
           <div :class="`${prefixCls}-entry__footer enter-x`">
             <ElButton
@@ -125,7 +123,7 @@ function handleShowForm(show = false) {
               :disabled="loading"
               @click="goLogin"
             >
-              {{ t('lock.backToLogin') }}
+              {{ t('components.lock.backToLogin') }}
             </ElButton>
             <ElButton
               type="primary"
@@ -135,7 +133,7 @@ function handleShowForm(show = false) {
               @click="unLock()"
               :disabled="loading"
             >
-              {{ t('lock.entrySystem') }}
+              {{ t('components.lock.entrySystem') }}
             </ElButton>
           </div>
         </div>

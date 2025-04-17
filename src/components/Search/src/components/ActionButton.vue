@@ -38,7 +38,7 @@ const onExpand = () => {
     :icon="useIcon({ icon: 'ep:search' })"
     @click="onSearch"
   >
-    {{ t('common.query') }}
+    {{ t('components.search.query') }}
   </ElButton>
   <ElButton
     v-if="showReset"
@@ -46,7 +46,7 @@ const onExpand = () => {
     :icon="useIcon({ icon: 'ep:refresh-right' })"
     @click="onReset"
   >
-    {{ t('common.reset') }}
+    {{ t('components.search.reset') }}
   </ElButton>
   <ElButton
     v-if="showExpand"
@@ -54,6 +54,6 @@ const onExpand = () => {
     text
     @click="onExpand"
   >
-    {{ t(visible ? 'common.shrink' : 'common.expand') }}
+    {{ t(visible ? 'components.search.shrink' : 'components.search.expand') }}
   </ElButton>
 </template>

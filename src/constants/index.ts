@@ -4,6 +4,16 @@
 export const SUCCESS_CODE = '00000'
 
 /**
+ * 账号未登录状态码
+ */
+export const NO_LOGIN_CODE = '10001'
+
+/**
+ * token 过期状态码
+ */
+export const TOKEN_EXPIRE_CODE = '10002'
+
+/**
  * 请求contentType
  */
 export const CONTENT_TYPE: AxiosContentType = 'application/json'
@@ -32,3 +42,9 @@ export const DEFAULT_FILTER_COLUMN = ['expand', 'selection']
  * 是否根据headers->content-type自动转换数据格式
  */
 export const TRANSFORM_REQUEST_DATA = true
+
+export enum AdminDialogType {
+  ADD = 'add',
+  EDIT = 'edit',
+  VIEW = 'view'
+}

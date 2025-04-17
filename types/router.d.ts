@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { defineComponent } from 'vue'
+import { AuthorizeModel } from '@/store/modules/app'
 
 /**
 * redirect: noredirect        当设置 noredirect 的时候该路由在面包屑导航中不可被点击
@@ -37,8 +38,9 @@ import { defineComponent } from 'vue'
 declare module 'vue-router' {
   interface RouteMeta extends Record<string | number | symbol, unknown> {
     title: string
-    permission?: string[]
-    showInStatic?: boolean
+    permission?: SimplePermission[]
+    containerComponentKeys?: Array<string>
+    showIn?: ('static' | AuthorizeModel)[]
     hidden?: boolean
     alwaysShow?: boolean
     icon?: string

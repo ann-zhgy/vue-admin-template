@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import { store } from '../index'
-import { RBACModelUserInfo, SimpleUserInfo } from '@/api/login/types'
+import { RBACModelUserInfo, SimpleUserInfo } from '@/api/authorization/login/types'
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from '@/hooks/web/useI18n'
-import { loginOutApi } from '@/api/login'
+import { logoutApi } from '@/api/authorization/login'
 import { useTagsViewStore } from './tagsView'
 import router from '@/router'
 import { usePermissionStore } from './permission'
 
 interface UserState {
   userInfo?: SimpleUserInfo | RBACModelUserInfo
-  token: string
+  token: string | null
 }
 
 export const useUserStore = defineStore('user', {
@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', {
     }
   },
   getters: {
-    getToken(): string {
+    getToken(): string | null {
       return this.token
     },
     getUserInfo(): SimpleUserInfo | RBACModelUserInfo | undefined {
@@ -29,7 +29,7 @@ export const useUserStore = defineStore('user', {
     }
   },
   actions: {
-    setToken(token: string) {
+    setToken(token: string | null) {
       this.token = token
     },
     setUserInfo(userInfo?: SimpleUserInfo | RBACModelUserInfo) {
@@ -43,17 +43,15 @@ export const useUserStore = defineStore('user', {
         type: 'warning'
       })
         .then(async () => {
-          const res = await loginOutApi().catch(() => {})
-          if (res) {
-            this.logout()
-          }
+          await logoutApi().catch(() => {})
+          this.logout()
         })
         .catch(() => {})
     },
     reset() {
       const tagsViewStore = useTagsViewStore()
       tagsViewStore.delAllViews()
-      this.setToken('')
+      this.setToken(null)
       this.setUserInfo(undefined)
       router.replace('/login')
       usePermissionStore().resetRouters()
@@ -62,7 +60,9 @@ export const useUserStore = defineStore('user', {
       this.reset()
     }
   },
-  persist: true
+  persist: {
+    paths: ['token']
+  }
 })
 
 export const useUserStoreWithOut = () => {
