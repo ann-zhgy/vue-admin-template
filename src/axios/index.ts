@@ -11,6 +11,7 @@ const request = (option: AxiosConfig) => {
     responseType: responseType,
     headers: {
       'Content-Type': CONTENT_TYPE,
+      appkey: import.meta.env.VITE_APP_KEY,
       ...headers
     }
   })
